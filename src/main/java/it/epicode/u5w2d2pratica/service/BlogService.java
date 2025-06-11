@@ -30,6 +30,7 @@ public class BlogService {
     //metodo per salvare  un nuovo studente
     public Blog saveBlog(BlogDto blogDto)throws AutoreNotFoundException {
         Autore autore=autoreService.getAutore(blogDto.getAuthorId());
+
         Blog blog=new Blog();
         blog.setCategoria(blogDto.getCategoria());
         blog.setContenuto(blogDto.getContenuto());
@@ -66,6 +67,7 @@ public class BlogService {
         blogDaCercare.setTempoDiLetturaMinuti(blogDto.getTempoDiLetturaMinuti());
 
 
+        // questo passaggio mi tocca farlo in quanto su BlogDTO ha una variabile che si chiamare authoreID
         if (blogDaCercare.getAutore().getId()!=blogDto.getAuthorId()){
             Autore autore=autoreService.getAutore(blogDto.getAuthorId());
             blogDaCercare.setAutore(autore);

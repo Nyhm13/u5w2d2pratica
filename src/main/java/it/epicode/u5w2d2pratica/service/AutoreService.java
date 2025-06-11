@@ -21,7 +21,8 @@ public class AutoreService {
 
 
     // metodo per creare un autore
-
+    //autorerepository puo salvare solo un oggetto di tipo Autore che è diverso da AutoreDto in quanto quest ultimo
+    // ha delle variabili in meno quindi lo usiamo
     public Autore saveAutore(AutoreDto autoreDto){
         Autore autore=new Autore();
         autore.setNome(autoreDto.getNome());
@@ -48,6 +49,7 @@ public class AutoreService {
     // metodo per modificare un autore
     public Autore updateAutore(int id,AutoreDto autoreDto)throws AutoreNotFoundException{
         Autore autoreDaTrovate=getAutore(id);
+
         autoreDaTrovate.setNome(autoreDto.getNome());
         autoreDaTrovate.setCognome(autoreDto.getCognome());
         autoreDaTrovate.setEmail(autoreDto.getEmail());
