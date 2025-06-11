@@ -1,7 +1,10 @@
 package it.epicode.u5w2d2pratica.service;
 
+import it.epicode.u5w2d2pratica.dto.AutoreDto;
 import it.epicode.u5w2d2pratica.exception.AutoreNotFoundException;
 import it.epicode.u5w2d2pratica.model.Autore;
+import it.epicode.u5w2d2pratica.repository.AutoreRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,43 +14,53 @@ import java.util.Random;
 @Service
 public class AutoreService {
 
-    List<Autore> listaAutori=new ArrayList<>();
+   @Autowired
+   private AutoreRepository autoreRepository;
+
+   //
 
 
     // metodo per creare un autore
 
-    public Autore saveAutore(Autore autore){
-        autore.setId(new Random().nextInt(1,10000));
-        autore.setAvatar("https://ui-avatars.com/api/?name=" + autore.getNome() + "+" + autore.getCognome());
-        listaAutori.add(autore);
-        return autore;
+    public Autore saveAutore(AutoreDto autoreDto){
+        Autore autore=new Autore();
+        autore.setNome(autoreDto.getNome());
+        autore.setCognome(autoreDto.getCognome());
+        autore.setEmail(autoreDto.getEmail());
+        autore.setDataDiNascita(autoreDto.getDataDiNascita());
+        autore.setAvatar("https://ui-avatars.com/api/?name=" + autoreDto.getNome() + "+" + autoreDto.getCognome());
+        return  autoreRepository.save(autore);
+
 
     }
     // metodo per cercare un autore per id
     public Autore getAutore(int id) throws AutoreNotFoundException{
-       return listaAutori.stream().filter(autore -> autore.getId()==id).
-                findFirst().orElseThrow(() -> new AutoreNotFoundException("Autore con id "+id+"non trovato"));
+//       return listaAutori.stream().filter(autore -> autore.getId()==id).
+//                findFirst().orElseThrow(() -> new AutoreNotFoundException("Autore con id "+id+"non trovato"));
+        return autoreRepository.findById(id).orElseThrow(() ->new AutoreNotFoundException("Autore con id "+id+" non trovato"));
+
     }
     // metodo get per l`intera lista di autori
     public List<Autore> getAllAutori(){
-        return listaAutori;
+        return autoreRepository.findAll();
     }
 
     // metodo per modificare un autore
-    public Autore updateAutore(int id,Autore autore)throws AutoreNotFoundException{
+    public Autore updateAutore(int id,AutoreDto autoreDto)throws AutoreNotFoundException{
         Autore autoreDaTrovate=getAutore(id);
-        autoreDaTrovate.setNome(autore.getNome());
-        autoreDaTrovate.setCognome(autore.getCognome());
-        autoreDaTrovate.setEmail(autore.getEmail());
-        autoreDaTrovate.setDataDiNascita(autore.getDataDiNascita());
-        return autoreDaTrovate;
+        autoreDaTrovate.setNome(autoreDto.getNome());
+        autoreDaTrovate.setCognome(autoreDto.getCognome());
+        autoreDaTrovate.setEmail(autoreDto.getEmail());
+        autoreDaTrovate.setDataDiNascita(autoreDto.getDataDiNascita());
+        autoreDaTrovate.setAvatar("https://ui-avatars.com/api/?name="+autoreDto.getNome()+"+"+autoreDto.getCognome());
+        return autoreRepository.save(autoreDaTrovate);
     }
 
 
     // metodo per deletare un autore passato un id
     public  void deleteAutore(int id)throws AutoreNotFoundException{
         Autore autoreDaElimiare= getAutore(id);
-        listaAutori.remove(autoreDaElimiare);
+        autoreRepository.delete(autoreDaElimiare);
 
     }
 }

@@ -1,5 +1,6 @@
 package it.epicode.u5w2d2pratica.controller;
 
+import it.epicode.u5w2d2pratica.dto.AutoreDto;
 import it.epicode.u5w2d2pratica.exception.AutoreNotFoundException;
 import it.epicode.u5w2d2pratica.model.Autore;
 import it.epicode.u5w2d2pratica.service.AutoreService;
@@ -15,8 +16,8 @@ public class AutoreController {
     private AutoreService autoreService;
 
     @PostMapping("/authors")
-    private Autore saveAutore(@RequestBody Autore autore){
-        return autoreService.saveAutore(autore);
+    private Autore saveAutore(@RequestBody AutoreDto autoreDto){
+        return autoreService.saveAutore(autoreDto);
     }
 
     @GetMapping("/authors/{id}")
@@ -30,8 +31,8 @@ public class AutoreController {
     }
 
     @PutMapping("/authors/{id}")
-    public Autore updateAutore(@PathVariable int id,@RequestBody Autore autore)throws AutoreNotFoundException{
-        return autoreService.updateAutore(id, autore);
+    public Autore updateAutore(@PathVariable int id,@RequestBody AutoreDto autoreDto)throws AutoreNotFoundException{
+        return autoreService.updateAutore(id, autoreDto);
     }
 
     @DeleteMapping("/authors/{id}")

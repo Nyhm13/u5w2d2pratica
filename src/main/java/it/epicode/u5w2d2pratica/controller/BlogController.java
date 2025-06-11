@@ -1,11 +1,13 @@
 package it.epicode.u5w2d2pratica.controller;
 
+import it.epicode.u5w2d2pratica.dto.BlogDto;
 import it.epicode.u5w2d2pratica.exception.AutoreNotFoundException;
 import it.epicode.u5w2d2pratica.exception.BlogNotFoundException;
 import it.epicode.u5w2d2pratica.model.Autore;
 import it.epicode.u5w2d2pratica.model.Blog;
 import it.epicode.u5w2d2pratica.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,8 +19,8 @@ public class BlogController {
     public BlogService blogService;
 
     @PostMapping("/blogPosts")
-    private Blog saveBlog(@RequestBody Blog blog){
-        return blogService.saveBlog(blog);
+    private Blog saveBlog(@RequestBody BlogDto blogDto)throws AutoreNotFoundException {
+        return blogService.saveBlog(blogDto);
     }
 
     @GetMapping("/blogPosts/{id}")
@@ -27,13 +29,15 @@ public class BlogController {
     }
 
     @GetMapping("/blogPosts")
-    public List<Blog> getAllBlogs(){
-        return  blogService.getListaBlogs();
+    public Page<Blog> getAllBlogs(    @RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "10")int size,
+                                      @RequestParam(defaultValue = "id")String sortBy){
+        return  blogService.getListaBlogs(page, size, sortBy);
     }
 
     @PutMapping("/blogPosts/{id}")
-    public Blog updateAutore(@PathVariable int id,@RequestBody Blog blog)throws BlogNotFoundException{
-        return blogService.updateBlog(id, blog);
+    public Blog updateAutore(@PathVariable int id,@RequestBody BlogDto blogDto)throws BlogNotFoundException,AutoreNotFoundException{
+        return blogService.updateBlog(id, blogDto);
     }
 
     @DeleteMapping("/blogPosts/{id}")
