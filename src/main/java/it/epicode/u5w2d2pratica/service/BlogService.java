@@ -1,5 +1,6 @@
 package it.epicode.u5w2d2pratica.service;
 
+import com.cloudinary.Cloudinary;
 import it.epicode.u5w2d2pratica.dto.BlogDto;
 import it.epicode.u5w2d2pratica.exception.AutoreNotFoundException;
 import it.epicode.u5w2d2pratica.exception.BlogNotFoundException;
@@ -11,9 +12,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -27,6 +33,12 @@ public class BlogService {
     // in quanto per creare un blog prima dobbiamo avere un autore
     private AutoreService autoreService;
 
+    @Autowired
+    private Cloudinary cloudinary;
+
+    @Autowired
+    private JavaMailSenderImpl javaMailSender;
+
     //metodo per salvare  un nuovo studente
     public Blog saveBlog(BlogDto blogDto)throws AutoreNotFoundException {
         Autore autore=autoreService.getAutore(blogDto.getAuthorId());
@@ -38,6 +50,9 @@ public class BlogService {
         blog.setTempoDiLetturaMinuti(blogDto.getTempoDiLetturaMinuti());
         blog.setAutore(autore);
         blog.setCover("https://picsum.photos/200/300");
+
+        sendMail("ryo13@hotmail.it");
+
         return blogRepository.save(blog);
     }
     //metodo per trovare un blog passando l`id
@@ -82,6 +97,26 @@ public class BlogService {
 
         Blog blogDaEliminare=getBlog(id);
         blogRepository.delete(blogDaEliminare);
+    }
+    public String patchBlog(int id, MultipartFile file) throws BlogNotFoundException, IOException {
+        Blog blogDaPatchare=getBlog(id);
+
+        String url=(String) cloudinary.uploader().upload(file.getBytes(), Collections.emptyMap()).get("url");
+
+        blogDaPatchare.setCover(url);
+
+        blogRepository.save(blogDaPatchare);
+
+        return url;
+    }
+
+    private void sendMail(String email) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Registrazione Servizio Crea il tuo blogpost dei sogni ");
+        message.setText("Registrazione al servizio rest avvenuta con successo");
+
+        javaMailSender.send(message);
     }
 
 }

@@ -1,15 +1,19 @@
 package it.epicode.u5w2d2pratica.service;
 
+import com.cloudinary.Cloudinary;
 import it.epicode.u5w2d2pratica.dto.AutoreDto;
 import it.epicode.u5w2d2pratica.exception.AutoreNotFoundException;
 import it.epicode.u5w2d2pratica.model.Autore;
 import it.epicode.u5w2d2pratica.repository.AutoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 public class AutoreService {
@@ -17,7 +21,11 @@ public class AutoreService {
    @Autowired
    private AutoreRepository autoreRepository;
 
-   //
+   @Autowired
+   private Cloudinary cloudinary;
+
+   @Autowired
+   private JavaMailSenderImpl javaMailSender;
 
 
     // metodo per creare un autore
@@ -30,6 +38,9 @@ public class AutoreService {
         autore.setEmail(autoreDto.getEmail());
         autore.setDataDiNascita(autoreDto.getDataDiNascita());
         autore.setAvatar("https://ui-avatars.com/api/?name=" + autoreDto.getNome() + "+" + autoreDto.getCognome());
+
+//        sendMail(autore.getEmail());
+        sendMail("ryo13@hotmail.it");
         return  autoreRepository.save(autore);
 
 
@@ -64,5 +75,25 @@ public class AutoreService {
         Autore autoreDaElimiare= getAutore(id);
         autoreRepository.delete(autoreDaElimiare);
 
+    }
+    public  String patchAutore(int id, MultipartFile file) throws AutoreNotFoundException, IOException {
+        Autore autoreDaPatchare=getAutore(id);
+
+        String url=(String) cloudinary.uploader().upload(file.getBytes(), Collections.emptyMap()).get("url");
+
+        autoreDaPatchare.setAvatar(url);
+
+        autoreRepository.save(autoreDaPatchare);
+
+        return url;
+    }
+
+    private void sendMail(String email) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Registrazione Servizio Crea il tuo blogpost dei sogni ");
+        message.setText("Registrazione al servizio rest avvenuta con successo");
+
+        javaMailSender.send(message);
     }
 }
